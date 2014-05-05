@@ -5,6 +5,8 @@
 
 #include<iostream>
 #include<vector>
+#include<stack>
+#include<stdio.h>
 #include<stdlib.h>
 #include<ctime>
 #include<cmath>
@@ -17,7 +19,12 @@ vector<int*> emptyG;
 void init();
 void updateScore();
 void yield();
-void operate();
+void waitOperate();
+
+void moveGrids(char dir);
+int getValue(char dir,int m,int n);
+void changeValue(char dir,int (*G)[6],int m,int n,int value);
+
 void printResult();
 bool checkDeath();
 
@@ -42,7 +49,6 @@ void init()
 			emptyG.push_back(&G[i][j]);
 		}
 	}
-
 	yield();
 }
 
@@ -76,7 +82,8 @@ void updateScore()
 //print current grids
 void printResult()
 {
-	cout<<"Current Grig:"<<endl;
+	cout<<"--------2048 C++ DEVISION HAVE FUN!!!-------\n"<<endl;
+	cout<<"Current Score:"<<Score<<endl;
 	cout<<"-------------------------"<<endl;
 	for(int i=1;i!=5;++i)
 	{
@@ -84,7 +91,12 @@ void printResult()
 		{
 			if(j==1)
 				cout<<"\t";
-			cout<<G[i][j]<<" ";
+			if(G[i][j]!=0)
+				cout<<G[i][j]<<"\t";
+			else
+				cout<<"[]"<<"\t";
+			if(j==4)
+				cout<<endl;
 		}
 		cout<<endl;
 	}
@@ -94,23 +106,117 @@ void printResult()
 
 
 //
-void operate()
+void waitOperate()
 {
 	cout<<"--Use u (up) d(down) l(left) r(right) to move the grids--"<<endl;
 	cout<<"Move deriction:";
 	char ch;
-	bool complete=true
 	while(cin>>ch)
 	{
 		if(ch=='u'||ch=='d'||ch=='l'||ch=='r')
 		{
-			moveGrid(ch);
+			moveGrids(ch);
+			break;
 		}
 		else
 		{
 			fflush(stdin);
 			cin.clear();
-			cout<<"Unknow input!"<<endl;
+			cout<<"Unknow Deriction!"<<endl;
+		}
+	}
+}
+
+//belongs to moveGrids,help to handle the deriction
+int getValue(char dir,int m,int n)
+{
+	if(dir=='l')
+	{
+		int temp=m;
+		m=n;
+		n=temp;
+	}
+	if(dir=='d')
+	{
+		m=5-m;
+	}
+	if(dir=='r')
+	{
+		n=5-n;
+	}
+	return G[m][n];
+}
+void changeValue(char dir,int (*G)[6],int m,int n,int value)
+{
+	if(dir=='l')
+	{
+		int temp=m;
+		m=n;
+		n=temp;
+	}
+	if(dir=='d')
+	{
+		m=5-m;
+	}
+	if(dir=='r')
+	{
+		n=5-n;
+	}
+	G[m][n]=value;	
+}
+
+//move the grids,dir is in(u d ,s r)
+void moveGrids(char dir)
+{
+	for(int j=1;j<=4;++j)
+	{
+		//sum operation,put the result into stk
+		stack<int> stk;
+		for(int i=1;i<=4;++i)
+		{
+
+			//int cur=G[i][j];
+			int cur=getValue(dir,i,j);
+			while(!stk.empty())
+			{
+				int before=stk.top();
+				if(before!=cur)
+				{
+					break;
+				}
+				else
+				{
+					stk.pop();
+					cur*=2;
+				}
+			}
+			if(cur!=0)
+				stk.push(cur);
+		}
+		//put the result into the current line
+		int sz=stk.size();
+		for(int i=sz+1;i<=4;++i)
+		{
+			//G[i][j]=0;
+			changeValue(dir,G,i,j,0);
+		}
+		while(sz)
+		{
+			//G[sz][j]=stk.top();
+			changeValue(dir,G,sz,j,stk.top());
+			stk.pop();
+			--sz;
+		}
+
+	}
+	//update emptyG vector
+	emptyG.clear();
+	for(int i=1;i!=5;++i)
+	{
+		for(int j=1;j!=5;++j)
+		{
+			if(G[i][j]==0)
+				emptyG.push_back(&G[i][j]);
 		}
 	}
 }
@@ -125,9 +231,14 @@ bool checkDeath()
 int main()
 {
 	init();
+	system("clear");
 	printResult();
-	operate();
-	printResult();
-	updateScore();
-	cout<<Score<<endl;
+	while(true)
+	{
+		waitOperate();
+		updateScore();
+		yield();
+		system("clear");
+		printResult();
+	}
 }
