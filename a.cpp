@@ -15,11 +15,13 @@ using namespace std;
 int G[6][6];
 int Score;
 vector<int*> emptyG;
+bool full=false;	//boost up autoOperate speed
+int moveTimes;
 
 void init();
 void updateScore();
 void yield();
-void waitOperate();
+void autoOperate(int cnt);
 
 void moveGrids(char dir);
 int getValue(char dir,int m,int n);
@@ -30,6 +32,7 @@ bool checkDeath();
 
 void init()
 {
+	moveTimes=0;
 	//set border
 	for(int i=0;i!=6;++i)
 	{
@@ -50,22 +53,33 @@ void init()
 		}
 	}
 	yield();
+	printResult();
 }
 
 //creat 2 in empty grid randomly，update emptyG vector
 void yield()
 {
-	int offset=emptyG.size()-1;	
-	srand((unsigned)time(NULL));
-	int randomOffset=rand()%offset;
+	if(emptyG.empty())
+		cerr<<"Grids is full!Yield failed..."<<endl;
+
+	int offset=emptyG.size()-1;	//caution offset=0 is special
+	int randomOffset;
+	if(offset==0)
+		randomOffset=0;
+	else
+	{
+		srand((unsigned)time(NULL));
+		randomOffset=rand()%offset;
+	}
 	vector<int*>::iterator iter=emptyG.begin()+randomOffset;
 	**iter=2;
-	emptyG.erase(iter);
+	//emptyG.erase(iter);	//moveGrids will updte emptyG vector
 }
 
 //update Score
 void updateScore()
 {
+	Score=0;
 	for(int i=1;i!=5;++i)
 	{
 		for(int j=1;j!=5;++j)
@@ -82,9 +96,13 @@ void updateScore()
 //print current grids
 void printResult()
 {
+	updateScore();
+
+	system("clear");
+
 	cout<<"--------2048 C++ DEVISION HAVE FUN!!!-------\n"<<endl;
 	cout<<"Current Score:"<<Score<<endl;
-	cout<<"-------------------------"<<endl;
+	cout<<"--------------------------------------------"<<endl;
 	for(int i=1;i!=5;++i)
 	{
 		for(int j=1;j!=5;++j)
@@ -100,31 +118,15 @@ void printResult()
 		}
 		cout<<endl;
 	}
-	cout<<"-------------------------"<<endl;
+	cout<<"--------------------------------------------"<<endl;
 	cout<<endl;
 }
 
 
-//
+//wait for operate
+//before this emptyG.empty()=false should be promised
 void waitOperate()
 {
-	cout<<"--Use u (up) d(down) l(left) r(right) to move the grids--"<<endl;
-	cout<<"Move deriction:";
-	char ch;
-	while(cin>>ch)
-	{
-		if(ch=='u'||ch=='d'||ch=='l'||ch=='r')
-		{
-			moveGrids(ch);
-			break;
-		}
-		else
-		{
-			fflush(stdin);
-			cin.clear();
-			cout<<"Unknow Deriction!"<<endl;
-		}
-	}
 }
 
 //belongs to moveGrids,help to handle the deriction
@@ -142,6 +144,9 @@ int getValue(char dir,int m,int n)
 	}
 	if(dir=='r')
 	{
+		int temp=m;
+		m=n;
+		n=temp;
 		n=5-n;
 	}
 	return G[m][n];
@@ -160,14 +165,19 @@ void changeValue(char dir,int (*G)[6],int m,int n,int value)
 	}
 	if(dir=='r')
 	{
+		int temp=m;
+		m=n;
+		n=temp;
 		n=5-n;
 	}
 	G[m][n]=value;	
 }
 
 //move the grids,dir is in(u d ,s r)
+//caution:when checkDeath=false && emptyG.empty()=true,there is a direction we can't move,only the other 3 choices will make sense
 void moveGrids(char dir)
 {
+	moveTimes++;
 	for(int j=1;j<=4;++j)
 	{
 		//sum operation,put the result into stk
@@ -219,26 +229,117 @@ void moveGrids(char dir)
 				emptyG.push_back(&G[i][j]);
 		}
 	}
+	//boost autoOperation
+	if(emptyG.empty())
+		full=true;
+	else
+		full=false;
 }
 
-//
+//check the Grids to return dead or not
 bool checkDeath()
 {
-
+	bool res=true;
+	for(int j=1;j<5;++j)
+	{
+		if(!true)
+			break;
+		for(int i=1;i<5;++i)
+		{
+			if(G[i][j]==0)
+			{
+				res=false;
+				break;
+			}
+			int t=G[i][j];
+			if(t==G[i+1][j]||t==G[i-1][j]||t==G[i][j+1]||t==G[i][j-1])
+			{
+				res=false;
+				break;
+			}
+		}
+	}
+	return res;
 }
 
+//auto operate cnt times
+void autoOperate(int cnt)
+{
+	cout<<"Auto operating "<<cnt<<" times,please wait...\n"<<endl;
+	char opt[4]={'u','d','l','r'};
+	while(cnt--)
+	{
+		if(full)
+		{
+			if(checkDeath())
+				break;
+		}
+		srand((unsigned)time(NULL));
+		int randomIx=rand()%4;
+		char dir=opt[randomIx];
+		moveGrids(dir);
+		if(full)
+		{
+			++cnt;
+			continue;
+		}
+		yield();
+		printResult();
+	}
+	printResult();
+}
 
 int main()
 {
 	init();
-	system("clear");
-	printResult();
-	while(true)
+	bool quit=false;	//use to quit the program
+	while(!checkDeath()&&!quit)
 	{
-		waitOperate();
-		updateScore();
-		yield();
-		system("clear");
-		printResult();
+		cout<<"----Input u (up) d(down) l(left) r(right) to move the Grids----"<<endl;
+		cout<<"--Input n(number) to let the Grids move n times automaticlly --"<<endl;
+		cout<<"-----Input q to quit the game,a(again) to restart the game-----"<<endl;
+		cout<<"Input>>";
+		char ch;
+		while(cin>>ch)
+		{
+			if(ch=='u'||ch=='d'||ch=='l'||ch=='r')
+			{
+				moveGrids(ch);
+				if(emptyG.empty())
+					continue;
+				yield();
+				printResult();
+				break;
+			}
+			else if(isdigit(ch))
+			{
+				int cnt=0;
+				cin.putback(ch);
+				cin>>cnt;
+				autoOperate(cnt);
+				break;
+			}
+			else if(ch=='q')
+			{
+				quit=true;
+				break;
+			}
+			else if(ch=='a')
+			{
+				init();
+				break;
+			}
+			else
+			{
+				fflush(stdin);
+				cin.clear();
+				cout<<"Undefined Input!"<<endl;
+			}
+		}
 	}
+	if(quit)
+		cout<<"------------------BYE BYE-------------------\n"<<endl;
+	else
+		cout<<"---------GAME OVER!  STUPID MACHINE!--------\n"<<endl;
+	cout<<"---------Moved "<<moveTimes<<" Times.  Score "<<Score<<".---------\n"<<endl;
 }
