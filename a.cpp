@@ -17,6 +17,7 @@ int Score;
 vector<int*> emptyG;
 bool full=false;	//boost up autoOperate speed
 int moveTimes;
+int actualMoveTimes;
 
 void init();
 void updateScore();
@@ -33,6 +34,8 @@ bool checkDeath();
 void init()
 {
 	moveTimes=0;
+	actualMoveTimes=-1;
+
 	//set border
 	for(int i=0;i!=6;++i)
 	{
@@ -44,9 +47,9 @@ void init()
 
 	emptyG.clear();
 	//inital grid and emptyGrid
-	for(int i=1;i!=5;++i)
+	for(int i=1;i<5;++i)
 	{
-		for(int j=1;j!=5;++j)
+		for(int j=1;j<5;++j)
 		{
 			G[i][j]=0;
 			emptyG.push_back(&G[i][j]);
@@ -74,6 +77,8 @@ void yield()
 	vector<int*>::iterator iter=emptyG.begin()+randomOffset;
 	**iter=2;
 	//emptyG.erase(iter);	//moveGrids will updte emptyG vector
+	
+	++actualMoveTimes;
 }
 
 //update Score
@@ -178,11 +183,11 @@ void changeValue(char dir,int (*G)[6],int m,int n,int value)
 void moveGrids(char dir)
 {
 	moveTimes++;
-	for(int j=1;j<=4;++j)
+	for(int j=1;j<5;++j)
 	{
 		//sum operation,put the result into stk
 		stack<int> stk;
-		for(int i=1;i<=4;++i)
+		for(int i=1;i<5;++i)
 		{
 
 			//int cur=G[i][j];
@@ -197,7 +202,7 @@ void moveGrids(char dir)
 				else
 				{
 					stk.pop();
-					cur*=2;
+					cur=cur+before;
 				}
 			}
 			if(cur!=0)
@@ -205,7 +210,7 @@ void moveGrids(char dir)
 		}
 		//put the result into the current line
 		int sz=stk.size();
-		for(int i=sz+1;i<=4;++i)
+		for(int i=sz+1;i<5;++i)
 		{
 			//G[i][j]=0;
 			changeValue(dir,G,i,j,0);
@@ -221,9 +226,9 @@ void moveGrids(char dir)
 	}
 	//update emptyG vector
 	emptyG.clear();
-	for(int i=1;i!=5;++i)
+	for(int i=1;i<5;++i)
 	{
-		for(int j=1;j!=5;++j)
+		for(int j=1;j<5;++j)
 		{
 			if(G[i][j]==0)
 				emptyG.push_back(&G[i][j]);
@@ -242,7 +247,7 @@ bool checkDeath()
 	bool res=true;
 	for(int j=1;j<5;++j)
 	{
-		if(!true)
+		if(!res)
 			break;
 		for(int i=1;i<5;++i)
 		{
@@ -345,5 +350,6 @@ int main()
 		cout<<"------------------BYE BYE-------------------\n"<<endl;
 	else
 		cout<<"---------GAME OVER!  STUPID MACHINE!--------\n"<<endl;
-	cout<<"---------Moved "<<moveTimes<<" Times.  Score "<<Score<<".---------\n"<<endl;
+	cout<<"-------Attempted To Move "<<moveTimes<<" Times.-------\n"<<endl;
+	cout<<"---Actual Moved "<<actualMoveTimes<<" Times. Final Score:"<<Score<<".---\n"<<endl;
 }
