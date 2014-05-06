@@ -331,9 +331,13 @@ int main()
 			}
 			else
 			{
-				fflush(stdin);
+				//fflush(stdin);	//vc6.0	 not transplantable
+				char t;
+				while((t=getchar())!='\n')
+					;
 				cin.clear();
 				cout<<"Undefined Input!"<<endl;
+				cout<<"Input>>";
 			}
 		}
 	}
