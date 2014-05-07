@@ -24,13 +24,13 @@ if [ "$var" = $opt1 ]; then
 	echo After 3 seconds the game will begin...
 	echo
 	sleep 3
-	~/code/git/2048_game/a
+	~/code/git/2048_game/game_start
 elif [ "$var" = $opt2 ]; then
 	echo You have choosed: $var
 	echo -e "\nWait for version2.0\nI will add this function...\n"
 elif [ "$var" = $opt3 ];then
 	echo You have choosed: $var
-	echo -e "\nwait for mysql or file\n"
+	~/code/git/2048_game/getRecord
 elif [ "$var" = $opt4 ];then
 	echo You have choosed: $var
 	echo -e "\nwait for the file\n"

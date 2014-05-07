@@ -19,6 +19,8 @@ bool full=false;	//boost up autoOperate speed
 int moveTimes;
 int actualMoveTimes;
 
+void insertRecord(string name,int score);
+
 void init();
 void updateScore();
 void yield();
@@ -336,7 +338,7 @@ int main()
 			}
 			else
 			{
-				//fflush(stdin);	//vc6.0	 not transplantable
+				//fflush(stdin);zo	//vc6.0	 not transplantable
 				char t;
 				while((t=getchar())!='\n')
 					;
@@ -352,4 +354,11 @@ int main()
 		cout<<"---------GAME OVER!  STUPID MACHINE!--------\n"<<endl;
 	cout<<"-------Attempted To Move "<<moveTimes<<" Times.-------\n"<<endl;
 	cout<<"---Actual Moved "<<actualMoveTimes<<" Times. Final Score:"<<Score<<".---\n"<<endl;
+	
+	string name;
+	string cleanStdin;	//Caution:clean the stdin first,otherwise getline will read '\n' into name
+	getline(cin,cleanStdin);
+	cout<<"\nInput your name:";
+	getline(cin,name);
+	insertRecord(name,Score);
 }
