@@ -1,14 +1,18 @@
-#include	"unp.h"
+#include"unp.h"
+#include<pthread.h>
 
-static void sig_handle(int);
-static bool game_over;
+int Score;
+void a2srv();
+bool other_head_dead;
+void* thr_fn(void *arg);
 
-int
-main(int argc, char **argv)
+int	sockfd, n;			
+char sendline[MAXLINE],recvline[MAXLINE];
+
+int main(int argc, char **argv)
 {
-	int	sockfd, n;			
-	char sendline[MAXLINE],recvline[MAXLINE];
 	struct sockaddr_in	servaddr;
+	pid_t pid;
 
 	if (argc != 2)
 		err_quit("usage: a.out <IPaddress>");
@@ -18,33 +22,58 @@ main(int argc, char **argv)
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port   = htons(1300);	/* daytime server */
+	servaddr.sin_port   = htons(1300);	
 	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0)
 		err_quit("inet_pton error for %s", argv[1]);
 
 	if (connect(sockfd, (SA *) &servaddr, sizeof(servaddr)) < 0)
 		err_sys("connect error");
 
-	game_over=false;
-	if(signal(SIGINT,sig_handle)==SIG_ERR)
-		err_sys("signal error");
 
-	while(!game_over&&fgets(sendline,MAXLINE,stdin)!=NULL)
+	while(fgets(sendline,MAXLINE,stdin)!=NULL)
 	{
 		writen(sockfd,sendline,strlen(sendline));
+		if(!strcmp(sendline,"start game\n"))
+		{
+			pthread_t ntid;
+			int err;
+
+			err=pthread_create(&ntid,NULL,thr_fn,NULL);
+		}
 		if(readline(sockfd,recvline,MAXLINE)==0)
 			err_quit("str_cli:server terminated prematurely");
-		if(!strcmp(recvline,"game over\n"))
-			raise(SIGINT);
 		else
 			fputs(recvline,stdout);
+		if(!strcmp(recvline,"game over!!!"))
+		{
+			other_head_dead=true;
+		}
 	}
 
 	exit(0);
 }
 
-void sig_handle(int signo)
+void *thr_fn(void* arg)
 {
-	game_over=true;
-	printf("signal received\n");
+	a2srv();
+	printf("Your score is %d\n",Score);
+	strcpy(sendline,"game over!!!");
+	printf("%s\n",sendline);
+	writen(sockfd,sendline,strlen(sendline));
+
+	char score[20];
+	int ix;
+	for(ix=0;Score!=0;++ix)
+	{
+		score[ix]=Score%10+'0';
+		Score/=10;
+	}
+	score[ix]='\0';
+	strcpy(sendline,score);
+	sleep(1);
+	int kk;
+	kk=writen(sockfd,sendline,strlen(sendline));
+	printf("%d\n",kk);
+	printf("%s\n",sendline);
+	exit(0);
 }

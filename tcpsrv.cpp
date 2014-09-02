@@ -1,14 +1,19 @@
-#include	"unp.h"
+#include"unp.h"
+#include<pthread.h>
 
-int a2srv();
+int Score;
+void a2srv();
+bool other_head_dead;
+void* thr_fn(void *arg);
 
-int
-main(int argc, char **argv)
+int listenfd, connfd;
+ssize_t	n;
+char buffpro[MAXLINE];
+char buffthr[MAXLINE];
+
+int	main(int argc, char **argv)
 {
-	int					listenfd, connfd;
-	ssize_t				n;
 	struct sockaddr_in	servaddr;
-	char				buff[MAXLINE];
 	time_t				ticks;
 
 	listenfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -25,20 +30,67 @@ main(int argc, char **argv)
 	for ( ; ; ) {
 		connfd = accept(listenfd, (SA *) NULL, NULL);
 
-		while( (n=read(connfd,buff,MAXLINE))>0)
+		while( (n=read(connfd,buffpro,MAXLINE))>0)
 		{
-			if(!strcmp(buff,"start game\n"))
+			printf("buffpro1: %s\n",buffpro);  //debug
+
+			if(!strcmp(buffpro,"game over!!!"))
 			{
-				int res=a2srv();
-				printf("Your score is %d\n",res);
-				writen(connfd,buff,n);
+				other_head_dead=true;
+				printf("it's right\n");  //debug
+				printf("buffpro2: %s\n",buffpro);  //debug
 			}
 			else
-				writen(connfd,buff,n);
+			{
+				int other_score=0;
+				int ix=0;
+				while(buffpro[ix]!='\0')
+					++ix;
+				for(int i=ix-1;ix>=0;--ix)
+				{
+					other_score=other_score*10+buffpro[ix]+'0';
+				}
+				printf("The other guy scored:");
+				printf("%d\n",other_score);
+			}
+			if(!strcmp(buffpro,"start game\n"))
+			{
+				pthread_t ntid;
+				int err;
+
+				err=pthread_create(&ntid,NULL,thr_fn,NULL);
+			}
+			else
+			{
+				strcpy(buffpro,"?");
+				writen(connfd,buffpro,n);
+			}
 		}
 		if(n<0)
 			err_sys("str_echo:read error");
 
 		close(connfd);
 	}
+}
+
+void *thr_fn(void* arg)
+{
+	a2srv();
+	printf("Your score is %d\n",Score);
+	strcpy(buffthr,"game over!!!");
+	writen(connfd,buffthr,n);
+
+	char score[20];
+	int ix;
+	for(ix=0;Score!=0;++ix)
+	{
+		score[ix]=Score%10+'0';
+		Score/=10;
+	}
+	score[ix]='\0';
+	strcpy(buffthr,"");
+	strcpy(buffthr,score);
+	printf("%s\n",buffthr);
+	writen(connfd,buffthr,strlen(buffthr));
+	exit(0);
 }

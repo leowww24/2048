@@ -13,7 +13,8 @@
 using namespace std;
 
 int G[6][6];
-int Score;
+extern int Score;
+extern bool other_head_dead;
 vector<int*> emptyG;
 bool full=false;	//boost up autoOperate speed
 int moveTimes;
@@ -35,6 +36,7 @@ bool checkDeath();
 
 void init()
 {
+	other_head_dead=false;
 	moveTimes=0;
 	actualMoveTimes=-1;
 
@@ -246,6 +248,9 @@ void moveGrids(char dir)
 //check the Grids to return dead or not
 bool checkDeath()
 {
+	if(other_head_dead)
+		return true;
+
 	bool res=true;
 	for(int j=1;j<5;++j)
 	{
@@ -296,7 +301,7 @@ void autoOperate(int cnt)
 	printResult();
 }
 
-int a2srv()
+void a2srv()
 {
 	init();
 	bool quit=false;	//use to quit the program
@@ -309,6 +314,8 @@ int a2srv()
 		char ch;
 		while(cin>>ch)
 		{
+			if(other_head_dead)
+				break;
 			if(ch=='u'||ch=='d'||ch=='l'||ch=='r')
 			{
 				moveGrids(ch);
@@ -351,9 +358,8 @@ int a2srv()
 	if(quit)
 		cout<<"------------------BYE BYE-------------------\n"<<endl;
 	else
-		cout<<"---------GAME OVER!  STUPID MACHINE!--------\n"<<endl;
+		cout<<"-----------------GAME OVER!-----------------\n"<<endl;
 	cout<<"-------Attempted To Move "<<moveTimes<<" Times.-------\n"<<endl;
 	cout<<"---Actual Moved "<<actualMoveTimes<<" Times. Final Score:"<<Score<<".---\n"<<endl;
 	
-	return Score;
 }
