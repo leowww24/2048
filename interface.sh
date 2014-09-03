@@ -30,7 +30,7 @@ elif [ "$var" = $opt2 ]; then
 	echo
 	opt21="Server"
 	opt22="Client"
-	opt23="Back"
+	opt23="Return"
 	optin2="$opt21/$opt22/$opt23"
 	select var2 in $optin2;do
 		if [ "$var2" = $opt21 ]; then
@@ -45,7 +45,7 @@ elif [ "$var" = $opt2 ]; then
 			read IPaddr
 			echo Connecting to ths host $IPaddr ...
 			sleep 1
-			echo Try to input 'start game' to start the game!
+			echo Try to input \'start game\' to start the game!
 			./tcpcli $IPaddr
 		elif [ "$var2" = $opt23 ]; then
 			echo You hava choosed: $var2
@@ -58,7 +58,8 @@ elif [ "$var" = $opt3 ];then
 	./getRecord
 elif [ "$var" = $opt4 ];then
 	echo You have choosed: $var
-	echo -e "\nwait for the file\n"
+	echo
+	less introFile
 elif [ "$var" = $opt5 ];then
 	exit
 else

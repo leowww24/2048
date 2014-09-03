@@ -40,8 +40,10 @@ int main(int argc, char **argv)
 			pthread_t ntid;
 			int err;
 
-			err=pthread_create(&ntid,NULL,thr_fn,NULL);
 			writen(sockfd,sendline,strlen(sendline));
+			printf("After 3 seconds,the game will begin...\n");
+			sleep(3);
+			err=pthread_create(&ntid,NULL,thr_fn,NULL);
 		}
 		else
 		{
@@ -50,22 +52,29 @@ int main(int argc, char **argv)
 		}
 		while( (n=readline(sockfd,recvline,MAXLINE))!=0)
 		{
-			if(!strcmp(recvline,"game over!!!"))
+			if(!strcmp(recvline,"game over!!!\n"))
 			{
 				other_head_dead=true;
-				printf("Game over!\n");
-				continue;
+				printf("Game over!\nWaiting for the result!\n");
 			}
 			else
 			{
 				recvline[n]='\0';
-				while(recvline[n]!='\0')
+				//printf("%d\n",n);	//debug;
+				//printf("%s\n",recvline);	//debug
+				while(recvline[ix]!='\0')
 					++ix;
 				for(int i=ix-1;i>=0;--i)
 				{
 					other_score=other_score*10+recvline[i]-'0';
 				}
 				printf("The other guy scored: %d\n",other_score);
+				if(Score>other_score)
+					printf("You win!\n");
+				else if(Score<other_score)
+					printf("You lose!\n");
+				else
+					printf("The game ends in a tie!\n");
 				exit(0);
 			}
 		}
@@ -79,18 +88,28 @@ void *thr_fn(void* arg)
 	a2srv();
 	printf("Your score is %d\n",Score);
 	strcpy(sendline,"game over!!!\n");
-	printf("%s\n",sendline); //debug
+	//printf("%s\n",sendline); //debug
 	writen(sockfd,sendline,strlen(sendline));
+	sleep(1);
 
 	char score[20];
 	int ix;
-	for(ix=0;Score!=0;++ix)
+	int temp=Score;
+	if(temp==0)
 	{
-		score[ix]=Score%10+'0';
-		Score/=10;
+		score[0]='0';
+		score[1]='\0';
 	}
-	score[ix]='\0';
+	else
+	{
+		for(ix=0;temp!=0;++ix)
+		{
+			score[ix]=temp%10+'0';
+			temp/=10;
+		}
+		score[ix]='\0';
+	}
 	strcpy(sendline,score);
-	printf("%s\n",sendline);  //debug
+	//printf("%s\n",sendline);  //debug
 	writen(sockfd,sendline,strlen(sendline));
 }
