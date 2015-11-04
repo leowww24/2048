@@ -360,5 +360,5 @@ int main()
 	getline(cin,cleanStdin);
 	cout<<"\nInput your name:";
 	getline(cin,name);
-	insertRecord(name,Score);
+	//insertRecord(name,Score);
 }

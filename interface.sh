@@ -4,10 +4,10 @@
 #########################################################################
 #!/bin/bash
 
-opt1="Single play"
-opt2="Network head2head"
-opt3="High scores"
-opt4="How to paly"
+opt1="Single Player"
+opt2="Network Head2Head"
+opt3="High Scores"
+opt4="How To Play"
 opt5="Exit"
 
 clear
@@ -28,9 +28,9 @@ if [ "$var" = $opt1 ]; then
 elif [ "$var" = $opt2 ]; then
 	echo You have choosed: $var
 	echo
-	opt21="Server"
-	opt22="Client"
-	opt23="Return"
+	opt21="Choose To Be Server"
+	opt22="Choose To Be Client"
+	opt23="Go Back"
 	optin2="$opt21/$opt22/$opt23"
 	select var2 in $optin2;do
 		if [ "$var2" = $opt21 ]; then
@@ -59,7 +59,7 @@ elif [ "$var" = $opt3 ];then
 elif [ "$var" = $opt4 ];then
 	echo You have choosed: $var
 	echo
-	less introFile
+	less howToPlay
 elif [ "$var" = $opt5 ];then
 	exit
 else
