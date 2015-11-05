@@ -1,9 +1,8 @@
 Old 2048 tiny game
 
 How to run
-1. config
-2. make
-3. make install
+1. make
+2. ./interface.sh
 
 How to play
 1. Type Enter to show memu

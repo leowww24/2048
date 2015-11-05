@@ -55,11 +55,11 @@ elif [ "$var" = $opt2 ]; then
 	done
 elif [ "$var" = $opt3 ];then
 	echo You have choosed: $var
-	./getRecord
+#	./getRecord
 elif [ "$var" = $opt4 ];then
 	echo You have choosed: $var
 	echo
-	less howToPlay
+	less res/howToPlay
 elif [ "$var" = $opt5 ];then
 	exit
 else

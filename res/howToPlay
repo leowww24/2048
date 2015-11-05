@@ -1,24 +1,20 @@
-程序说明：
-1、单机模式
-	选择单机模式，3秒钟后游戏开始
-	输入u(up)\d(down)\l(left)\r(right)控制方格移动
-	输入整形数字n，系统将随机执行n次合法移动,移动是随机的，可能导致game over
-	输入a(again)从新开始游戏
-	输入q(quit)强制结束游戏
-	游戏结束后，系统提示输入玩家姓名，游戏记录自动写入数据库
-2、联机对战模式
-	进入该模式后选择作为对战主机或客户机,选择“return”可回到主界面
-	在对方建立主机情况下，客户机输入主机IP地址，请求联接
-	联接成功后客户机输入“start game”，双方同时倒计时后，游戏开始
-	任何一方游戏结束，对方会收到通知，游戏双方显示彼此分数和胜负结果后退出
-3、查看游戏记录
-	显示历史玩家的成绩记录，分数由高到低排列
-4、查看游戏说明
-5、退出程序
-
-
-注：
-	在任意菜单界面，单击回车可显示当前菜单选项
-	输入“q”，退出当前说明界面
-
-
+How to play
+1. Type Enter to show memu
+2. Single Player Mode
+	When single mode selected, game will start after 3 mins
+	Input u(up)\d(down)\l(left)\r(right) to move
+	Input an integer "n" to random move "n" times
+	Input a(again) to restart game
+	Input q(quit) to quit game
+	After game input user name to store data into file(DB)
+3. Network Head2Head 
+	Type Enter to show menu
+	Select to be Server of Client
+	Establish server
+	Client input server's IP to connect to server
+	Client input "start game" to start game
+	Anyone who game over, the other will receive an the game result
+4. High Scores
+	To query game record of Single Player Mode order by scores desc
+5. How To Play
+	Refer to How to play
